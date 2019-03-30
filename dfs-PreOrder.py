@@ -9,12 +9,13 @@ class State:
         #A table that dictates if a block has aonother block sitting on it
         #E.x If B sits on A: on[0] = 1 given that A->0, B->1, C->2 etc
         self.on = [None] * n
+        self.parent = None
 
     def CreateChildren(currState,nodeList,n):
         #1st iter -> A Block (x=0)
         #2nd iter -> B Block (x=1)
         #3rd iter -> C Block (x=2)
-        for x in range(0,3):
+        for x in range(0,n):
             print(x)
             if currState.on[x] == None:
                 #The i var (except when i=n) represents the block we want to put
@@ -29,10 +30,11 @@ class State:
                             if currState.on[i] == None:
                                 nodeList.append(State(n))
                                 nodeList[-1] = copy.deepcopy(currState)
+                                nodeList[-1].parent = currState
                                 if currState.table[x] == 1:
                                     nodeList[-1].table[x] = 0
                                 else:
-                                    for j in range(0,3):
+                                    for j in range(0,n):
                                         if currState.on[j] == x:
                                             nodeList[-1].on[j] = None
                                 nodeList[-1].on[i] = x
@@ -43,19 +45,58 @@ class State:
                         if currState.table[x] == 0:
                             nodeList.append(State(n))
                             nodeList[-1] = copy.deepcopy(currState)
+                            nodeList[-1].parent = currState
                             nodeList[-1].table[x] = 1
-                            for j in range(0,3):
+                            for j in range(0,n):
                                 if nodeList[-1].on[j] == x:
                                     nodeList[-1].on[j] = None
                             print(nodeList[-1].table)
                             print(nodeList[-1].on)
                             print("\n")
 
+    def TreeTraverse(currState,n,nodeList,nodeStack,goalState):
+        treeDepth = 0
+        #Each block can be at the right place with max 2 moves
+        maxDepth = 2*n
+        foundSolution = False
+
+        while foundSolution == False:
+            if treeDepth != maxDepth:
+                State.CreateChildren(currState,nodeList,n)
+                print(nodeList)
+
+                for x in range(0,len(nodeList)):
+                    nodeStack.append(nodeList.pop())
+
+                print("\n")
+                print(nodeStack)
+                treeDepth = treeDepth + 1
+                currState = nodeStack.pop()
+                if currState.table == goalState.table and currState.on == goalState.on:
+                    foundSolution = True
+                    print("Solution")
+            elif len(nodeStack) > 0:
+                currState = nodeStack.pop()
+                if currState.table == goalState.table and currState.on == goalState.on:
+                    foundSolution = True
+                    print("Solution")
+                    print(currState.table)
+                    print(currState.on)
+        return currState
+
+    def FindMoves(currState):
+        parentStack = []
+        while currState.parent != None:
+            parentStack.append(currState.parent)
+            currState = parentStack[-1]
+
+        return parentStack
 
 
 def main():
     n = 3
     nodeList = []
+    nodeStack = []
 
     startState = State(n)
     goalState = State(n)
@@ -84,7 +125,17 @@ def main():
     print(currState.on)
     print("\n")
 
-    State.CreateChildren(currState,nodeList,n)
+    currState = State.TreeTraverse(startState,n,nodeList,nodeStack,goalState)
+    parentStack = State.FindMoves(currState)
+    print("\n")
+
+    for x in range(len(parentStack)):
+        tmp = parentStack.pop()
+        print(tmp.table)
+        print(tmp.on)
+        print("\n")
+
+
 
 if __name__ == '__main__':
     main()
