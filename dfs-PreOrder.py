@@ -86,12 +86,28 @@ class State:
 
     def FindMoves(currState):
         parentStack = []
+        parentStack.append(currState)
         while currState.parent != None:
             parentStack.append(currState.parent)
             currState = parentStack[-1]
 
         return parentStack
 
+    def PrintMoves(parentStack):
+        for x in range(len(parentStack)-1,-1,-1):
+            for y in range(0,n):
+                if parentStack[x].table[j] == 0 and parentStack[x-1].table[j] == 1:
+                    destination = "table"
+                    who = j
+                    if parentStack[x].on[j] != parentStack[x-1].on[j]:
+                        source = j
+                elif parentStack[x] == 1 and parentStack[x-1] == 0:
+                    source = "table"
+                    who = j
+                    if parentStack[x].on[j] != parentStack[x-1].on[j]:
+                        destination = j
+                else:
+                    print("Not yet ready")
 
 def main():
     n = 3
@@ -129,7 +145,10 @@ def main():
     parentStack = State.FindMoves(currState)
     print("\n")
 
-    for x in range(len(parentStack)):
+    State.PrintMoves(parentStack)
+
+    print("\n\nMoves: \n")
+    while len(parentStack) != 0:
         tmp = parentStack.pop()
         print(tmp.table)
         print(tmp.on)
