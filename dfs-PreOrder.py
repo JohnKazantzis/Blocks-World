@@ -94,28 +94,33 @@ class State:
         return parentStack
 
     def PrintMoves(currState,parentStack,n):
-        print(len(parentStack))
-        for x in range(0,len(parentStack)-1):
+        numOfChecks = len(parentStack) - 1
+        for x in range(0,numOfChecks):
             for y in range(0,n):
-                print(parentStack[-1].table[y])
-                print(parentStack[-2].table[y])
-                if parentStack[x].table[y] == 0 and parentStack[x+1].table[y] == 1:
+                print("\n")
+                print(y)
+                print(parentStack[x].table[y])
+                print(parentStack[x+1].table[y])
+                print("\n")
+                if parentStack[x+1].table[y] == 0 and parentStack[x].table[y] == 1:
                     destination = "table"
                     who = y
-                    if parentStack[x].on[y] != parentStack[x+1].on[y]:
-                        source = y
-                        print(x," moved from ",source," to ",destination)
-                    parentStack.pop()
-                elif parentStack[x].table[y] == 1 and parentStack[x+1].table[y] == 0:
+                    for j in range(0,n):
+                        if parentStack[x].on[y] != parentStack[x+1].on[y]:
+                            source = y
+                            print(x," moved from ",source," to ",destination)
+                elif parentStack[x+1].table[y] == 1 and parentStack[x].table[y] == 0:
                     source = "table"
                     who = y
-                    if parentStack[x].on[y] != parentStack[x+1].on[y]:
-                        destination = y
-                        print(x," moved from ",source," to ",destination)
-                    parentStack.pop()
+                    print("hey")
+                    print(parentStack[x].on[y])
+                    print(parentStack[x+1].on[y])
+                    for j in range(0,n):
+                        if parentStack[x].on[j] != parentStack[x+1].on[j]:
+                            destination = j
+                            print(who," moved from ",source," to ",destination)
                 else:
                     print("Not yet ready")
-                    parentStack.pop()
 
 def main():
     n = 3
@@ -154,20 +159,13 @@ def main():
     parentStack = State.FindMoves(currState)
     print("\n")
 
-    while len(parentStack) != 0:
-        tmp = parentStack.pop()
-        kStack.append(tmp)
-
-    x = 0
-    while len(kStack) != x:
-        print(kStack[x].table)
-        print(kStack[x].on)
+    print("\n\nMoves: \n")
+    for x in range(0,len(parentStack)):
+        print(parentStack[x].table)
+        print(parentStack[x].on)
         print("\n")
-        x = x + 1
 
-    State.PrintMoves(currState,kStack,n)
-    for x in range(0,len(parentStack)-5):
-        print(x)
+    State.PrintMoves(currState,parentStack,n)
 
     print("\n\nMoves: \n")
     while len(parentStack) != 0:
@@ -175,7 +173,6 @@ def main():
         print(tmp.table)
         print(tmp.on)
         print("\n")
-
 
 
 if __name__ == '__main__':
