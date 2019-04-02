@@ -93,26 +93,35 @@ class State:
 
         return parentStack
 
-    def PrintMoves(parentStack):
-        for x in range(len(parentStack)-1,-1,-1):
+    def PrintMoves(currState,parentStack,n):
+        print(len(parentStack))
+        for x in range(0,len(parentStack)-1):
             for y in range(0,n):
-                if parentStack[x].table[j] == 0 and parentStack[x-1].table[j] == 1:
+                print(parentStack[-1].table[y])
+                print(parentStack[-2].table[y])
+                if parentStack[x].table[y] == 0 and parentStack[x+1].table[y] == 1:
                     destination = "table"
-                    who = j
-                    if parentStack[x].on[j] != parentStack[x-1].on[j]:
-                        source = j
-                elif parentStack[x] == 1 and parentStack[x-1] == 0:
+                    who = y
+                    if parentStack[x].on[y] != parentStack[x+1].on[y]:
+                        source = y
+                        print(x," moved from ",source," to ",destination)
+                    parentStack.pop()
+                elif parentStack[x].table[y] == 1 and parentStack[x+1].table[y] == 0:
                     source = "table"
-                    who = j
-                    if parentStack[x].on[j] != parentStack[x-1].on[j]:
-                        destination = j
+                    who = y
+                    if parentStack[x].on[y] != parentStack[x+1].on[y]:
+                        destination = y
+                        print(x," moved from ",source," to ",destination)
+                    parentStack.pop()
                 else:
                     print("Not yet ready")
+                    parentStack.pop()
 
 def main():
     n = 3
     nodeList = []
     nodeStack = []
+    kStack = []
 
     startState = State(n)
     goalState = State(n)
@@ -145,7 +154,20 @@ def main():
     parentStack = State.FindMoves(currState)
     print("\n")
 
-    State.PrintMoves(parentStack)
+    while len(parentStack) != 0:
+        tmp = parentStack.pop()
+        kStack.append(tmp)
+
+    x = 0
+    while len(kStack) != x:
+        print(kStack[x].table)
+        print(kStack[x].on)
+        print("\n")
+        x = x + 1
+
+    State.PrintMoves(currState,kStack,n)
+    for x in range(0,len(parentStack)-5):
+        print(x)
 
     print("\n\nMoves: \n")
     while len(parentStack) != 0:
