@@ -84,6 +84,7 @@ class State:
                     print(currState.on)
         return currState
 
+    #This function helps find the path from the root to the solution.
     def FindMoves(currState):
         parentStack = []
         parentStack.append(currState)
@@ -94,14 +95,11 @@ class State:
         return parentStack
 
     def PrintMoves(currState,parentStack,n):
+        #Num of checks value. E.x If there are n states, there are n-1 moves
         numOfChecks = len(parentStack) - 1
         for x in range(0,numOfChecks):
             for y in range(0,n):
-                print("\n")
-                print(y)
-                print(parentStack[x].table[y])
-                print(parentStack[x+1].table[y])
-                print("\n")
+                #Case when a block moves to the table from the top of another block
                 if parentStack[x+1].table[y] == 0 and parentStack[x].table[y] == 1:
                     destination = "table"
                     who = y
@@ -109,18 +107,24 @@ class State:
                         if parentStack[x].on[y] != parentStack[x+1].on[y]:
                             source = y
                             print(x," moved from ",source," to ",destination)
+                #Case when a block moves from the table to the top of another block
                 elif parentStack[x+1].table[y] == 1 and parentStack[x].table[y] == 0:
                     source = "table"
                     who = y
-                    print("hey")
-                    print(parentStack[x].on[y])
-                    print(parentStack[x+1].on[y])
                     for j in range(0,n):
                         if parentStack[x].on[j] != parentStack[x+1].on[j]:
                             destination = j
                             print(who," moved from ",source," to ",destination)
+                #Case when a block moves from the top of a block to the top
+                #of another block
                 else:
-                    print("Not yet ready")
+                    if parentStack[x].on[y] == None and parentStack[x+1].on[y] != None:
+                        source = y
+                        who = parentStack[x+1].on[y]
+                        for j in range(0,n):
+                            if parentStack[x].on[j] != None and parentStack[x+1].on[j] == None:
+                                destination = j
+                                print(who," moved from ",source," to ",destination)
 
 def main():
     n = 3
@@ -158,12 +162,6 @@ def main():
     currState = State.TreeTraverse(startState,n,nodeList,nodeStack,goalState)
     parentStack = State.FindMoves(currState)
     print("\n")
-
-    print("\n\nMoves: \n")
-    for x in range(0,len(parentStack)):
-        print(parentStack[x].table)
-        print(parentStack[x].on)
-        print("\n")
 
     State.PrintMoves(currState,parentStack,n)
 
