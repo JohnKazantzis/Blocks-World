@@ -16,7 +16,8 @@ class State:
         #2nd iter -> B Block (x=1)
         #3rd iter -> C Block (x=2)
         for x in range(0,n):
-            print(x)
+            #print(x)
+            #If currState.on[x] != None then the block cant move
             if currState.on[x] == None:
                 #The i var (except when i=n) represents the block we want to put
                 #the x block on. The i=n value represents the table
@@ -38,9 +39,9 @@ class State:
                                         if currState.on[j] == x:
                                             nodeList[-1].on[j] = None
                                 nodeList[-1].on[i] = x
-                                print(nodeList[-1].table)
-                                print(nodeList[-1].on)
-                                print("\n")
+                                #print(nodeList[-1].table)
+                                #print(nodeList[-1].on)
+                                #print("\n")
                     elif i == n and i != x:
                         if currState.table[x] == 0:
                             nodeList.append(State(n))
@@ -50,38 +51,47 @@ class State:
                             for j in range(0,n):
                                 if nodeList[-1].on[j] == x:
                                     nodeList[-1].on[j] = None
-                            print(nodeList[-1].table)
-                            print(nodeList[-1].on)
-                            print("\n")
+                            #print(nodeList[-1].table)
+                            #print(nodeList[-1].on)
+                            #print("\n")
 
     def TreeTraverse(currState,n,nodeList,nodeStack,goalState):
         treeDepth = 0
         #Each block can be at the right place with max 2 moves
         maxDepth = 2*n
         foundSolution = False
+        numOfChildren = []
 
         while foundSolution == False:
-            if treeDepth != maxDepth:
+            if treeDepth < maxDepth:
                 State.CreateChildren(currState,nodeList,n)
-                print(nodeList)
+                #print(nodeList)
+                numOfChildren.append(len(nodeList)-1)
+
 
                 for x in range(0,len(nodeList)):
                     nodeStack.append(nodeList.pop())
 
-                print("\n")
-                print(nodeStack)
+                #print("\n")
+                #print(nodeStack)
                 treeDepth = treeDepth + 1
                 currState = nodeStack.pop()
                 if currState.table == goalState.table and currState.on == goalState.on:
                     foundSolution = True
                     print("Solution")
-            elif len(nodeStack) > 0:
+            elif numOfChildren[-1] > 0:
                 currState = nodeStack.pop()
+                numOfChildren[-1] = numOfChildren[-1] - 1
                 if currState.table == goalState.table and currState.on == goalState.on:
                     foundSolution = True
                     print("Solution")
                     print(currState.table)
                     print(currState.on)
+            else:
+                numOfChildren.pop()
+                treeDepth = treeDepth - 1
+                currState = nodeStack.pop()
+
         return currState
 
     #This function helps find the path from the root to the solution.
@@ -137,26 +147,32 @@ def main():
     currState = State(n)
 
     #Creating the starting state
-    startState.table[1] = 1
+    # startState.table[1] = 1
+    # startState.table[2] = 1
+    # startState.on[1] = 0
+    startState.table[0] = 1
     startState.table[2] = 1
-    startState.on[1] = 0
+    startState.on[0] = 1
     print("\nInit...")
     print(startState.table)
     print(startState.on)
 
     #Creating the goal state
+    # goalState.table[2] = 1
+    # goalState.on[2] = 0
+    # goalState.on[0] = 1
     goalState.table[2] = 1
+    goalState.table[1] = 1
     goalState.on[2] = 0
-    goalState.on[0] = 1
     print("\nGoal...")
     print(goalState.table)
     print(goalState.on)
 
     #Initializing the current state
     currState = startState
-    print("\nCurrent...")
-    print(currState.table)
-    print(currState.on)
+    # print("\nCurrent...")
+    # print(currState.table)
+    # print(currState.on)
     print("\n")
 
     currState = State.TreeTraverse(startState,n,nodeList,nodeStack,goalState)
