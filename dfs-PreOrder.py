@@ -105,35 +105,48 @@ class State:
         return parentStack
 
     def PrintMoves(currState,parentStack,n):
+        parentList = []
         #Num of checks value. E.x If there are n states, there are n-1 moves
-        numOfChecks = len(parentStack) - 1
+        #print("-"*50)
+        while len(parentStack) != 0:
+            tmp = parentStack.pop()
+            #print(tmp.table)
+            #print(tmp.on)
+            parentList.append(tmp)
+        #print("-"*50)
+        print("-"*50)
+        for x in range(0,len(parentList)):
+            print(parentList[x].table)
+            print(parentList[x].on)
+        print("-"*50)
+        numOfChecks = len(parentList) - 1
         for x in range(0,numOfChecks):
             for y in range(0,n):
                 #Case when a block moves to the table from the top of another block
-                if parentStack[x+1].table[y] == 0 and parentStack[x].table[y] == 1:
+                if parentList[x].table[y] == 0 and parentList[x+1].table[y] == 1:
                     destination = "table"
                     who = y
                     for j in range(0,n):
-                        if parentStack[x].on[y] != parentStack[x+1].on[y]:
-                            source = y
-                            print(x," moved from ",source," to ",destination)
+                        if parentList[x].on[j] != parentList[x+1].on[j]:
+                            source = j
+                            print(who," moved from ",source," to ",destination)
                 #Case when a block moves from the table to the top of another block
-                elif parentStack[x+1].table[y] == 1 and parentStack[x].table[y] == 0:
+                elif parentList[x].table[y] == 1 and parentList[x+1].table[y] == 0:
                     source = "table"
                     who = y
                     for j in range(0,n):
-                        if parentStack[x].on[j] != parentStack[x+1].on[j]:
+                        if parentList[x].on[j] != parentList[x+1].on[j]:
                             destination = j
                             print(who," moved from ",source," to ",destination)
                 #Case when a block moves from the top of a block to the top
                 #of another block
                 else:
-                    if parentStack[x].on[y] == None and parentStack[x+1].on[y] != None:
-                        source = y
-                        who = parentStack[x+1].on[y]
+                    if parentList[x].on[y] == None and parentList[x+1].on[y] != None:
+                        destination = y
+                        who = parentList[x+1].on[y]
                         for j in range(0,n):
-                            if parentStack[x].on[j] != None and parentStack[x+1].on[j] == None:
-                                destination = j
+                            if parentList[x].on[j] != None and parentList[x+1].on[j] == None:
+                                source = j
                                 print(who," moved from ",source," to ",destination)
 
 def main():
@@ -181,12 +194,12 @@ def main():
 
     State.PrintMoves(currState,parentStack,n)
 
-    print("\n\nMoves: \n")
-    while len(parentStack) != 0:
-        tmp = parentStack.pop()
-        print(tmp.table)
-        print(tmp.on)
-        print("\n")
+    # print("\n\nMoves: \n")
+    # while len(parentStack) != 0:
+    #     tmp = parentStack.pop()
+    #     print(tmp.table)
+    #     print(tmp.on)
+    #     print("\n")
 
 
 if __name__ == '__main__':
