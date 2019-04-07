@@ -129,7 +129,7 @@ class State:
                     for j in range(0,n):
                         if parentList[x].on[j] != parentList[x+1].on[j]:
                             source = j
-                            print(who," moved from ",source," to ",destination)
+                            print("Move(" + str(who) + "," + str(source) + "," + str(destination) + ")")
                 #Case when a block moves from the table to the top of another block
                 elif parentList[x].table[y] == 1 and parentList[x+1].table[y] == 0:
                     source = "table"
@@ -137,7 +137,7 @@ class State:
                     for j in range(0,n):
                         if parentList[x].on[j] != parentList[x+1].on[j]:
                             destination = j
-                            print(who," moved from ",source," to ",destination)
+                            print("Move(" + str(who) + "," + str(source) + "," + str(destination) + ")")
                 #Case when a block moves from the top of a block to the top
                 #of another block
                 else:
@@ -147,7 +147,7 @@ class State:
                         for j in range(0,n):
                             if parentList[x].on[j] != None and parentList[x+1].on[j] == None:
                                 source = j
-                                print(who," moved from ",source," to ",destination)
+                                print("Move(" + str(who) + "," + str(source) + "," + str(destination) + ")")
 
 def main():
     n = 3
