@@ -1,4 +1,5 @@
 import copy
+import queue
 
 #Class that represents the state of the problem
 class State:
@@ -54,6 +55,24 @@ class State:
                             #print(nodeList[-1].table)
                             #print(nodeList[-1].on)
                             #print("\n")
+
+    def BreadthFirstSearch(currState,n,nodeList,nodeStack,goalState):
+        foundSolution = False
+        q = queue.Queue()
+        q.put(currState)
+        while foundSolution == False:
+            currState = q.get()
+            if currState.table == goalState.table and currState.on == goalState.on:
+                foundSolution = True
+                print("Solution")
+                print(currState.table)
+                print(currState.on)
+            else:
+                State.CreateChildren(currState,nodeList,n)
+                for x in nodeList:
+                    q.put(x)
+        return currState
+
 
     def TreeTraverse(currState,n,nodeList,nodeStack,goalState):
         treeDepth = 0
@@ -186,12 +205,19 @@ def main():
     # print("\nCurrent...")
     # print(currState.table)
     # print(currState.on)
-    print("\n")
+    print("In Depth First Search")
 
     currState = State.TreeTraverse(startState,n,nodeList,nodeStack,goalState)
     parentStack = State.FindMoves(currState)
     print("\n")
 
+    State.PrintMoves(currState,parentStack,n)
+
+    print("\n\nBreadth First Search:")
+    currState = startState
+    currState = State.BreadthFirstSearch(startState,n,nodeList,nodeStack,goalState)
+    parentStack = State.FindMoves(currState)
+    print("\n")
     State.PrintMoves(currState,parentStack,n)
 
     # print("\n\nMoves: \n")
