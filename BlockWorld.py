@@ -1,5 +1,7 @@
 import copy
 import queue
+import sys
+import re
 
 #Class that represents the state of the problem
 class State:
@@ -168,6 +170,29 @@ class State:
                                 source = j
                                 print("Move(" + str(who) + "," + str(source) + "," + str(destination) + ")")
 
+def Parser():
+    inputObj = open(sys.argv[2],"r")
+    input = inputObj.readlines()
+    print(input)
+
+    #Storing n
+    blockNames = re.findall("[A-Z]",input[2])
+    print(blockNames)
+    n = len(blockNames)
+
+    x = 4
+    initLen = 5
+    while re.search("",input[x]):
+        x = x + 1
+        initLen = initLen + 1
+
+    for x in range(4,initLen):
+        init = re.findall("",input[x+4])
+    print(init)
+
+
+
+
 def main():
     n = 3
     nodeList = []
@@ -226,6 +251,8 @@ def main():
     #     print(tmp.table)
     #     print(tmp.on)
     #     print("\n")
+
+    Parser()
 
 
 if __name__ == '__main__':
