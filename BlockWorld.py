@@ -171,27 +171,52 @@ class State:
                                 print("Move(" + str(who) + "," + str(source) + "," + str(destination) + ")")
 
 def Parser():
+
     inputObj = open(sys.argv[2],"r")
     input = inputObj.readlines()
-    print(input)
+    #print(input)
 
     #Storing n
     blockNames = re.findall("[A-Z]",input[2])
-    print(blockNames)
     n = len(blockNames)
 
-    x = 4
-    initLen = 5
-    while re.search("",input[x]):
+    startState = State(n)
+
+    #Storing INIT
+    x = 3
+    initLen = 3
+    while re.search("goal",input[x]) == None:
         x = x + 1
         initLen = initLen + 1
 
-    for x in range(4,initLen):
-        init = re.findall("",input[x+4])
+    init = []
+    tmpinit = []
+    for x in range(3,initLen):
+        tmpinit.append(re.findall("[(][A-Z\s]*[)]",input[x]))
+    for x in tmpinit:
+        for y in x:
+            init.append(y)
+
+    #Stripping ()
+    for x in range(len(init)):
+        init[x] = init[x].strip("()")
+
+    #Removing HANDEMPTY
+    init.remove("HANDEMPTY")
     print(init)
 
+    #Initializing the starting state
+    for x in init:
+        tmp = x.split()
+        #print(tmp)
+        if tmp[0] == "CLEAR":
+            startState.on[blockNames.index(tmp[1])] = None
+        elif tmp[0] == "ONTABLE":
+            startState.table[blockNames.index(tmp[1])] = 1
+        elif tmp[0] == "ON":
+            startState.on[blockNames.index(tmp[2])] = blockNames.index(tmp[1])
 
-
+    return startState
 
 def main():
     n = 3
@@ -252,7 +277,10 @@ def main():
     #     print(tmp.on)
     #     print("\n")
 
-    Parser()
+    print("\n")
+    startState = Parser()
+    print(startState.table)
+    print(startState.on)
 
 
 if __name__ == '__main__':
