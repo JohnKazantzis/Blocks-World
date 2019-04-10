@@ -181,6 +181,7 @@ def Parser():
     n = len(blockNames)
 
     startState = State(n)
+    goalState = State(n)
 
     #Storing INIT
     x = 3
@@ -197,13 +198,24 @@ def Parser():
         for y in x:
             init.append(y)
 
+    #Storing GOAL state
+    goal = []
+    tmpgoal = []
+    for x in range(initLen,len(input)):
+        tmpgoal.append(re.findall("[(][A-Z\s]*[)]",input[x]))
+    for x in tmpgoal:
+        for y in x:
+            goal.append(y)
+    print(goal)
+
     #Stripping ()
     for x in range(len(init)):
         init[x] = init[x].strip("()")
+    for x in range(len(goal)):
+        goal[x] = goal[x].strip("()")
 
     #Removing HANDEMPTY
     init.remove("HANDEMPTY")
-    print(init)
 
     #Initializing the starting state
     for x in init:
@@ -216,7 +228,18 @@ def Parser():
         elif tmp[0] == "ON":
             startState.on[blockNames.index(tmp[2])] = blockNames.index(tmp[1])
 
-    return startState
+    #Initializing the goal state
+    for x in goal:
+        tmp = x.split()
+        #print(tmp)
+        if tmp[0] == "CLEAR":
+            goalState.on[blockNames.index(tmp[1])] = None
+        elif tmp[0] == "ONTABLE":
+            goalState.table[blockNames.index(tmp[1])] = 1
+        elif tmp[0] == "ON":
+            goalState.on[blockNames.index(tmp[2])] = blockNames.index(tmp[1])
+
+    return startState, goalState
 
 def main():
     n = 3
@@ -278,9 +301,12 @@ def main():
     #     print("\n")
 
     print("\n")
-    startState = Parser()
+    startState, goalState = Parser()
     print(startState.table)
     print(startState.on)
+    print("\nGoal...")
+    print(goalState.table)
+    print(goalState.on)
 
 
 if __name__ == '__main__':
