@@ -63,7 +63,7 @@ class State:
         foundSolution = False
         q = queue.Queue()
         q.put(currState)
-        print(nodeList)
+        #print(nodeList)
         while foundSolution == False:
             currState = q.get()
             if currState.table == goalState.table and currState.on == goalState.on:
@@ -73,7 +73,7 @@ class State:
                 print(currState.on)
             else:
                 State.CreateChildren(currState,nodeList,n)
-                print(len(nodeList))
+                #print(len(nodeList))
                 #print(nodeList)
                 for x in nodeList:
                     q.put(x)
@@ -88,41 +88,61 @@ class State:
         #Each block can be at the right place with max 2 moves
         maxDepth = 2*n
         foundSolution = False
-        numOfChildren = []
 
         while foundSolution == False:
             if treeDepth < maxDepth:
-                print("1")
-                State.CreateChildren(currState,nodeList,n)
-                #print(nodeList)
-                numOfChildren.append(len(nodeList)-1)
+                #print("1")
+                if treeDepth < 2*n-1:
+                    State.CreateChildren(currState,nodeList,n)
+                #print(len(nodeList))
 
+                tmpstack = []
+                for x in range(len(nodeList)-1,-1,-1):
+                    tmpstack.append(nodeList[x])
 
-                for x in range(0,len(nodeList)):
-                    nodeStack.append(nodeList.pop())
+                nodeStack.append(copy.deepcopy(tmpstack))
+                #print(nodeStack)
+
+                nodeList.clear()
+                tmpstack.clear()
+                #print(len(nodeStack))
+                #print(len(nodeList))
 
                 #print("\n")
                 #print(nodeStack)
                 treeDepth = treeDepth + 1
-                currState = nodeStack.pop()
-                if currState.table == goalState.table and currState.on == goalState.on:
-                    foundSolution = True
-                    print("Solution")
-            elif numOfChildren[-1] > 0:
-                print("2")
-                currState = nodeStack.pop()
-                numOfChildren[-1] = numOfChildren[-1] - 1
+
+                currStack = nodeStack[-1]
+                while len(currStack) == 0:
+                    nodeStack.pop()
+                    currStack = nodeStack[-1]
+                    treeDepth = treeDepth - 1
+
+                currState = currStack.pop()
+                #print(nodeStack)
+                #nodeStack.append(currStack)
+
                 if currState.table == goalState.table and currState.on == goalState.on:
                     foundSolution = True
                     print("Solution")
                     print(currState.table)
                     print(currState.on)
-            else:
-                print("3")
-                numOfChildren.pop()
-                treeDepth = treeDepth - 1
-                if len(nodeStack) > 0:
-                    currState = nodeStack.pop()
+            # elif numOfChildren[-1] > 0:
+            #     #print("2")
+            #     currState = nodeStack.pop()
+            #     numOfChildren[-1] = numOfChildren[-1] - 1
+            #     if currState.table == goalState.table and currState.on == goalState.on:
+            #         foundSolution = True
+            #         print("Solution")
+            #         print(currState.table)
+            #         print(currState.on)
+            # else:
+            #     #print("3")
+            #     numOfChildren.pop()
+            #     print(len(numOfChildren))
+            #     treeDepth = treeDepth - 1
+            #     if len(nodeStack) > 0:
+            #         currState = nodeStack.pop()
 
         return currState
 
@@ -217,7 +237,7 @@ def Parser():
     for x in tmpgoal:
         for y in x:
             goal.append(y)
-    print(goal)
+    #print(goal)
 
     #Stripping ()
     for x in range(len(init)):
@@ -254,11 +274,11 @@ def Parser():
     for x in range(n):
         onTableBlock.append(x)
     onTableBlock.append(None)
-    print(onTableBlock)
+    #print(onTableBlock)
     for x in goalState.on:
         del onTableBlock[onTableBlock.index(x)]
 
-    print(onTableBlock)
+    #print(onTableBlock)
     goalState.table[onTableBlock[0]] = 1
 
     return startState, goalState, n
@@ -277,23 +297,23 @@ def main():
     # startState.table[1] = 1
     # startState.table[2] = 1
     # startState.on[1] = 0
-    startState.table[0] = 1
-    startState.table[2] = 1
-    startState.on[0] = 1
-    print("\nInit...")
-    print(startState.table)
-    print(startState.on)
-
-    #Creating the goal state
+    # startState.table[0] = 1
+    # startState.table[2] = 1
+    # startState.on[0] = 1
+    # print("\nInit...")
+    # print(startState.table)
+    # print(startState.on)
+    #
+    # #Creating the goal state
+    # # goalState.table[2] = 1
+    # # goalState.on[2] = 0
+    # # goalState.on[0] = 1
     # goalState.table[2] = 1
+    # goalState.table[1] = 1
     # goalState.on[2] = 0
-    # goalState.on[0] = 1
-    goalState.table[2] = 1
-    goalState.table[1] = 1
-    goalState.on[2] = 0
-    print("\nGoal...")
-    print(goalState.table)
-    print(goalState.on)
+    # print("\nGoal...")
+    # print(goalState.table)
+    # print(goalState.on)
 
     startState, goalState, n = Parser()
     print("\nInit...")
@@ -306,28 +326,28 @@ def main():
     #Initializing the current state
     currState = startState
 
-    print("In Depth First Search")
+    print("\n\n****In Depth First Search:****")
 
-    # currState = State.TreeTraverse(startState,n,nodeList,nodeStack,goalState)
-    # parentStack = State.FindMoves(currState)
-    # print("\n")
-    #
-    # State.PrintMoves(currState,parentStack,n)
+    currState = State.TreeTraverse(startState,n,nodeList,nodeStack,goalState)
+    parentStack = State.FindMoves(currState)
+    print("\n")
 
-    print("\n\nBreadth First Search:")
+    State.PrintMoves(currState,parentStack,n)
+
+    print("\n\n****Breadth First Search:****")
     currState = startState
     currState = State.BreadthFirstSearch(startState,n,nodeList,nodeStack,goalState)
     parentStack = State.FindMoves(currState)
     print("\n")
     State.PrintMoves(currState,parentStack,n)
 
-    print("\n")
-    startState, goalState, n = Parser()
-    print(startState.table)
-    print(startState.on)
-    print("\nGoal...")
-    print(goalState.table)
-    print(goalState.on)
+    # print("\n")
+    # startState, goalState, n = Parser()
+    # print(startState.table)
+    # print(startState.on)
+    # print("\nGoal...")
+    # print(goalState.table)
+    # print(goalState.on)
 
 
 if __name__ == '__main__':
