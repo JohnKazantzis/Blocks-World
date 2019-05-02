@@ -177,32 +177,28 @@ class State:
                 #Case when a block moves to the table from the top of another block
                 if parentList[x].table[y] == 0 and parentList[x+1].table[y] == 1:
                     destination = "table"
-                    who = y
+                    who = blockNames[y]
                     for j in range(0,n):
                         if parentList[x].on[j] != parentList[x+1].on[j]:
-                            source = j
-                            #blockNames.index(source)
-                            #print(blockNames[who])
+                            source = blockNames[j]
                             print("Move(" + str(who) + "," + str(source) + "," + str(destination) + ")")
-                            #print("Move(" + blockNames[who] + "," + blockNames[source] + "," + blockNames[destination] + ")")
                 #Case when a block moves from the table to the top of another block
                 elif parentList[x].table[y] == 1 and parentList[x+1].table[y] == 0:
                     source = "table"
-                    who = y
+                    who = blockNames[y]
                     for j in range(0,n):
                         if parentList[x].on[j] != parentList[x+1].on[j]:
-                            destination = j
-                            print("Move(" + str(who) + "," + str(source) + "," + str(destination) + ")")
+                            destination = blockNames[j]
                             print("Move(" + str(who) + "," + str(source) + "," + str(destination) + ")")
                 #Case when a block moves from the top of a block to the top
                 #of another block
                 else:
                     if parentList[x].on[y] == None and parentList[x+1].on[y] != None:
-                        destination = y
-                        who = parentList[x+1].on[y]
+                        destination = blockNames[y]
+                        who = blockNames[parentList[x+1].on[y]]
                         for j in range(0,n):
                             if parentList[x].on[j] != None and parentList[x+1].on[j] == None:
-                                source = j
+                                source = blockNames[j]
                                 print("Move(" + str(who) + "," + str(source) + "," + str(destination) + ")")
 
 def Parser():
@@ -287,6 +283,27 @@ def Parser():
 
     return startState, goalState, n , blockNames
 
+def PrintStartGoalState(startState,goalState,blockNames,n):
+
+    sState = copy.deepcopy(startState)
+    gState = copy.deepcopy(goalState)
+
+    for x in range(n):
+        if sState.on[x] != None:
+            sState.on[x] = blockNames[int(sState.on[x])]
+        if gState.on[x] != None:
+            gState.on[x] = blockNames[int(gState.on[x])]
+
+
+    print("\nInit...")
+    print(sState.table)
+    print(sState.on)
+    print("\nGoal...")
+    print(gState.table)
+    print(gState.on)
+
+
+
 def main():
     n = 3
     nodeList = []
@@ -301,16 +318,17 @@ def main():
     currState = startState
 
     print(blockNames)
+    print("\nInit...")
+    print(startState.table)
+    print(startState.on)
+    print("\nGoal...")
+    print(goalState.table)
+    print(goalState.on)
 
     #Choosing Deapth or Breadth first Search
     if sys.argv[1] == "depth":
         #Printing Starting and goal state
-        print("\nInit...")
-        print(startState.table)
-        print(startState.on)
-        print("\nGoal...")
-        print(goalState.table)
-        print(goalState.on)
+        PrintStartGoalState(startState,goalState,blockNames,n)
 
         print("\n\n****In Depth First Search:****")
         currState = State.TreeTraverse(startState,n,nodeList,nodeStack,goalState)
@@ -319,12 +337,7 @@ def main():
         State.PrintMoves(currState,parentStack,n,blockNames)
     elif sys.argv[1] == "breadth":
         #Printing Starting and goal state
-        print("\nInit...")
-        print(startState.table)
-        print(startState.on)
-        print("\nGoal...")
-        print(goalState.table)
-        print(goalState.on)
+        PrintStartGoalState(startState,goalState,blockNames,n)
 
         print("\n\n****Breadth First Search:****")
         currState = startState
