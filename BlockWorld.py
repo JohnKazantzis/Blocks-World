@@ -156,7 +156,7 @@ class State:
 
         return parentStack
 
-    def PrintMoves(currState,parentStack,n):
+    def PrintMoves(currState,parentStack,n,blockNames):
         parentList = []
         #Num of checks value. E.x If there are n states, there are n-1 moves
         #print("-"*50)
@@ -181,7 +181,10 @@ class State:
                     for j in range(0,n):
                         if parentList[x].on[j] != parentList[x+1].on[j]:
                             source = j
+                            #blockNames.index(source)
+                            #print(blockNames[who])
                             print("Move(" + str(who) + "," + str(source) + "," + str(destination) + ")")
+                            #print("Move(" + blockNames[who] + "," + blockNames[source] + "," + blockNames[destination] + ")")
                 #Case when a block moves from the table to the top of another block
                 elif parentList[x].table[y] == 1 and parentList[x+1].table[y] == 0:
                     source = "table"
@@ -189,6 +192,7 @@ class State:
                     for j in range(0,n):
                         if parentList[x].on[j] != parentList[x+1].on[j]:
                             destination = j
+                            print("Move(" + str(who) + "," + str(source) + "," + str(destination) + ")")
                             print("Move(" + str(who) + "," + str(source) + "," + str(destination) + ")")
                 #Case when a block moves from the top of a block to the top
                 #of another block
@@ -281,7 +285,7 @@ def Parser():
     #print(onTableBlock)
     goalState.table[onTableBlock[0]] = 1
 
-    return startState, goalState, n
+    return startState, goalState, n , blockNames
 
 def main():
     n = 3
@@ -293,61 +297,44 @@ def main():
     goalState = State(n)
     currState = State(n)
 
-    #Creating the starting state
-    # startState.table[1] = 1
-    # startState.table[2] = 1
-    # startState.on[1] = 0
-    # startState.table[0] = 1
-    # startState.table[2] = 1
-    # startState.on[0] = 1
-    # print("\nInit...")
-    # print(startState.table)
-    # print(startState.on)
-    #
-    # #Creating the goal state
-    # # goalState.table[2] = 1
-    # # goalState.on[2] = 0
-    # # goalState.on[0] = 1
-    # goalState.table[2] = 1
-    # goalState.table[1] = 1
-    # goalState.on[2] = 0
-    # print("\nGoal...")
-    # print(goalState.table)
-    # print(goalState.on)
-
-    startState, goalState, n = Parser()
-    print("\nInit...")
-    print(startState.table)
-    print(startState.on)
-    print("\nGoal...")
-    print(goalState.table)
-    print(goalState.on)
-
-    #Initializing the current state
+    startState, goalState, n, blockNames = Parser()
     currState = startState
 
-    print("\n\n****In Depth First Search:****")
+    print(blockNames)
 
-    currState = State.TreeTraverse(startState,n,nodeList,nodeStack,goalState)
-    parentStack = State.FindMoves(currState)
-    print("\n")
+    #Choosing Deapth or Breadth first Search
+    if sys.argv[1] == "depth":
+        #Printing Starting and goal state
+        print("\nInit...")
+        print(startState.table)
+        print(startState.on)
+        print("\nGoal...")
+        print(goalState.table)
+        print(goalState.on)
 
-    State.PrintMoves(currState,parentStack,n)
+        print("\n\n****In Depth First Search:****")
+        currState = State.TreeTraverse(startState,n,nodeList,nodeStack,goalState)
+        parentStack = State.FindMoves(currState)
+        print("\n")
+        State.PrintMoves(currState,parentStack,n,blockNames)
+    elif sys.argv[1] == "breadth":
+        #Printing Starting and goal state
+        print("\nInit...")
+        print(startState.table)
+        print(startState.on)
+        print("\nGoal...")
+        print(goalState.table)
+        print(goalState.on)
 
-    print("\n\n****Breadth First Search:****")
-    currState = startState
-    currState = State.BreadthFirstSearch(startState,n,nodeList,nodeStack,goalState)
-    parentStack = State.FindMoves(currState)
-    print("\n")
-    State.PrintMoves(currState,parentStack,n)
+        print("\n\n****Breadth First Search:****")
+        currState = startState
+        currState = State.BreadthFirstSearch(startState,n,nodeList,nodeStack,goalState)
+        parentStack = State.FindMoves(currState)
+        print("\n")
+        State.PrintMoves(currState,parentStack,n,blockNames)
+    else:
+        print("Error: Algorithms supported: breadth | depth ")
 
-    # print("\n")
-    # startState, goalState, n = Parser()
-    # print(startState.table)
-    # print(startState.on)
-    # print("\nGoal...")
-    # print(goalState.table)
-    # print(goalState.on)
 
 
 if __name__ == '__main__':
