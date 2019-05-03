@@ -302,6 +302,54 @@ def PrintStartGoalState(startState,goalState,blockNames,n):
     print(gState.table)
     print(gState.on)
 
+def CalcBestFirstNodeCosts(n,children,goalState):
+    score = []
+    inOrderChildren = []
+
+    #Calculating the score for each node
+    for x in children:
+        score.append(1)
+        for i in range(n):
+            if x.table[i] != goalState.table[i]:
+                score[-1] = score[-1] + 1
+            if x.on[i] != goalState.on[i]:
+                score[-1] = score[-1] + 1
+
+    #Creating the sorted(according to score) Children list
+    for x in range(len(children)):
+        maxChild = min(score)
+        pos = score.index(maxChild)
+
+        #Setting the score of the max equal to "infinite"
+        score[pos] = 1000000
+        inOrderChildren.append(children[pos])
+
+    return inOrderChildren
+
+def BestFirstSearch(startState,goalState,n):
+    #Best First Search
+    currState = copy.deepcopy(startState)
+    nodeList = []
+    closedNodes = []
+    tempList = []
+
+    while currState.table != goalState.table and currState.on != goalState.on:
+        State.CreateChildren(currState,nodeList,n)
+        tempList = CalcBestFirstNodeCosts(n,nodeList,goalState)
+
+        for x in tempList:
+            closedNodes.append(x)
+
+        currState = closedNodes.pop(0)
+        nodeList.clear()
+
+
+    print("Solution:")
+    print(currState.table)
+    print(currState.on)
+
+    return currState
+
 
 
 def main():
@@ -317,13 +365,13 @@ def main():
     startState, goalState, n, blockNames = Parser()
     currState = startState
 
-    print(blockNames)
-    print("\nInit...")
-    print(startState.table)
-    print(startState.on)
-    print("\nGoal...")
-    print(goalState.table)
-    print(goalState.on)
+    # print(blockNames)
+    # print("\nInit...")
+    # print(startState.table)
+    # print(startState.on)
+    # print("\nGoal...")
+    # print(goalState.table)
+    # print(goalState.on)
 
     #Choosing Deapth or Breadth first Search
     if sys.argv[1] == "depth":
@@ -342,6 +390,16 @@ def main():
         print("\n\n****Breadth First Search:****")
         currState = startState
         currState = State.BreadthFirstSearch(startState,n,nodeList,nodeStack,goalState)
+        parentStack = State.FindMoves(currState)
+        print("\n")
+        State.PrintMoves(currState,parentStack,n,blockNames)
+    elif sys.argv[1] == "best":
+        #Printing Starting and goal state
+        PrintStartGoalState(startState,goalState,blockNames,n)
+
+        print("\n\n****Best First Search:****")
+        #Best First Search
+        currState = BestFirstSearch(startState,goalState,n)
         parentStack = State.FindMoves(currState)
         print("\n")
         State.PrintMoves(currState,parentStack,n,blockNames)
