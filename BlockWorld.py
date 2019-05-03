@@ -20,7 +20,6 @@ class State:
         #2nd iter -> B Block (x=1)
         #3rd iter -> C Block (x=2)
         for x in range(0,n):
-            #print(x)
             #If currState.on[x] != None then the block cant move
             if currState.on[x] == None:
                 #The i var (except when i=n) represents the block we want to put
@@ -43,9 +42,7 @@ class State:
                                         if currState.on[j] == x:
                                             nodeList[-1].on[j] = None
                                 nodeList[-1].on[i] = x
-                                #print(nodeList[-1].table)
-                                #print(nodeList[-1].on)
-                                #print("\n")
+
                     elif i == n:
                         if currState.table[x] == 0:
                             nodeList.append(State(n))
@@ -55,9 +52,6 @@ class State:
                             for j in range(0,n):
                                 if nodeList[-1].on[j] == x:
                                     nodeList[-1].on[j] = None
-                            #print(nodeList[-1].table)
-                            #print(nodeList[-1].on)
-                            #print("\n")
 
     def BreadthFirstSearch(currState,n,nodeList,nodeStack,goalState):
         foundSolution = False
@@ -91,25 +85,18 @@ class State:
 
         while foundSolution == False:
             if treeDepth < maxDepth:
-                #print("1")
                 if treeDepth < 2*n-1:
                     State.CreateChildren(currState,nodeList,n)
-                #print(len(nodeList))
 
                 tmpstack = []
                 for x in range(len(nodeList)-1,-1,-1):
                     tmpstack.append(nodeList[x])
 
                 nodeStack.append(copy.deepcopy(tmpstack))
-                #print(nodeStack)
 
                 nodeList.clear()
                 tmpstack.clear()
-                #print(len(nodeStack))
-                #print(len(nodeList))
 
-                #print("\n")
-                #print(nodeStack)
                 treeDepth = treeDepth + 1
 
                 currStack = nodeStack[-1]
@@ -119,30 +106,12 @@ class State:
                     treeDepth = treeDepth - 1
 
                 currState = currStack.pop()
-                #print(nodeStack)
-                #nodeStack.append(currStack)
 
                 if currState.table == goalState.table and currState.on == goalState.on:
                     foundSolution = True
                     print("Solution")
                     print(currState.table)
                     print(currState.on)
-            # elif numOfChildren[-1] > 0:
-            #     #print("2")
-            #     currState = nodeStack.pop()
-            #     numOfChildren[-1] = numOfChildren[-1] - 1
-            #     if currState.table == goalState.table and currState.on == goalState.on:
-            #         foundSolution = True
-            #         print("Solution")
-            #         print(currState.table)
-            #         print(currState.on)
-            # else:
-            #     #print("3")
-            #     numOfChildren.pop()
-            #     print(len(numOfChildren))
-            #     treeDepth = treeDepth - 1
-            #     if len(nodeStack) > 0:
-            #         currState = nodeStack.pop()
 
         return currState
 
