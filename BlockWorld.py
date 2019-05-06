@@ -2,7 +2,8 @@ import copy
 import queue
 import sys
 import re
-sys.setrecursionlimit(5000)
+import time
+sys.setrecursionlimit(50000)
 
 #Class that represents the state of the problem
 class State:
@@ -135,11 +136,11 @@ class State:
             #print(tmp.on)
             parentList.append(tmp)
         #print("-"*50)
-        print("-"*50)
-        for x in range(0,len(parentList)):
-            print(parentList[x].table)
-            print(parentList[x].on)
-        print("-"*50)
+        # print("-"*50)
+        # for x in range(0,len(parentList)):
+        #     print(parentList[x].table)
+        #     print(parentList[x].on)
+        # print("-"*50)
         numOfChecks = len(parentList) - 1
         for x in range(0,numOfChecks):
             for y in range(0,n):
@@ -151,6 +152,7 @@ class State:
                         if parentList[x].on[j] != parentList[x+1].on[j]:
                             source = blockNames[j]
                             print("Move(" + str(who) + "," + str(source) + "," + str(destination) + ")")
+                            #return y
                 #Case when a block moves from the table to the top of another block
                 elif parentList[x].table[y] == 1 and parentList[x+1].table[y] == 0:
                     source = "table"
@@ -159,6 +161,7 @@ class State:
                         if parentList[x].on[j] != parentList[x+1].on[j]:
                             destination = blockNames[j]
                             print("Move(" + str(who) + "," + str(source) + "," + str(destination) + ")")
+                            #return y
                 #Case when a block moves from the top of a block to the top
                 #of another block
                 else:
@@ -169,6 +172,7 @@ class State:
                             if parentList[x].on[j] != None and parentList[x+1].on[j] == None:
                                 source = blockNames[j]
                                 print("Move(" + str(who) + "," + str(source) + "," + str(destination) + ")")
+                                #return parentList[x+1].on[y]
 
 def Parser():
 
@@ -176,9 +180,28 @@ def Parser():
     input = inputObj.readlines()
     #print(input)
 
-    #Storing n
-    blockNames = re.findall("[A-Z]",input[2])
+    x = 2
+    nameLen = 2
+    while re.search("init|INIT",input[x]) == None:
+        x = x + 1
+        nameLen = nameLen + 1
+
+    blockNames = []
+    blockNamesinit = []
+    for x in range(2,nameLen):
+        blockNamesinit.append(re.findall("[A-Z][0-9]*",input[x]))
+    for x in blockNamesinit:
+        for y in x:
+            blockNames.append(y)
+
+    #blockNames = re.findall("[A-Z][0-9]*",input[2])
     n = len(blockNames)
+
+    #Storing n
+    # blockNames = re.findall("[A-Z][0-9]*",input[2])
+    # n = len(blockNames)
+    # print(blockNames)
+    # print(len(blockNames))
 
     startState = State(n)
     goalState = State(n)
@@ -186,23 +209,23 @@ def Parser():
     #Storing INIT
     x = 3
     initLen = 3
-    while re.search("goal",input[x]) == None:
+    while re.search("goal|GOAL",input[x]) == None:
         x = x + 1
         initLen = initLen + 1
 
     init = []
     tmpinit = []
     for x in range(3,initLen):
-        tmpinit.append(re.findall("[(][A-Z\s]*[)]",input[x]))
+        tmpinit.append(re.findall("[(][A-Z0-9\s]*[)]",input[x]))
     for x in tmpinit:
         for y in x:
             init.append(y)
-
+    #print(init)
     #Storing GOAL state
     goal = []
     tmpgoal = []
     for x in range(initLen,len(input)):
-        tmpgoal.append(re.findall("[(][A-Z\s]*[)]",input[x]))
+        tmpgoal.append(re.findall("[(][A-Z0-9\s]*[)]",input[x]))
     for x in tmpgoal:
         for y in x:
             goal.append(y)
@@ -217,10 +240,12 @@ def Parser():
     #Removing HANDEMPTY
     init.remove("HANDEMPTY")
 
+    # print(init)
+    # print(goal)
+    # print("\n\n")
     #Initializing the starting state
     for x in init:
         tmp = x.split()
-        #print(tmp)
         if tmp[0] == "CLEAR":
             startState.on[blockNames.index(tmp[1])] = None
         elif tmp[0] == "ONTABLE":
@@ -277,7 +302,7 @@ def CalcBestFirstNodeCosts(n,children,goalState):
 
     #Calculating the score for each node
     for x in children:
-        score.append(1)
+        score.append(0)
         for i in range(n):
             if x.table[i] != goalState.table[i]:
                 score[-1] = score[-1] + 1
@@ -286,8 +311,8 @@ def CalcBestFirstNodeCosts(n,children,goalState):
 
     #Creating the sorted(according to score) Children list
     for x in range(len(children)):
-        maxChild = min(score)
-        pos = score.index(maxChild)
+        minChild = min(score)
+        pos = score.index(minChild)
 
         #Setting the score of the max equal to "infinite"
         score[pos] = 1000000
@@ -319,7 +344,145 @@ def BestFirstSearch(startState,goalState,n):
 
     return currState
 
+def MoveReturn(currState,parentStack,n,blockNames):
+    parentList = []
+    #Num of checks value. E.x If there are n states, there are n-1 moves
+    #print("-"*50)
+    parentList.append(parentStack.pop(0))
+    parentList.append(parentStack.pop(0))
+    # while len(parentStack) != 0:
+    #     tmp = parentStack.pop()
+    #     #print(tmp.table)
+    #     #print(tmp.on)
+    #     parentList.append(tmp)
+    #print("-"*50)
+    # print("-"*50)
+    # for x in range(0,len(parentList)):
+    #     print(parentList[x].table)
+    #     print(parentList[x].on)
+    # print("-"*50)
+    numOfChecks = len(parentList) - 1
+    for x in range(0,numOfChecks):
+        for y in range(0,n):
+            #Case when a block moves to the table from the top of another block
+            if parentList[x].table[y] == 0 and parentList[x+1].table[y] == 1:
+                destination = "table"
+                who = blockNames[y]
+                for j in range(0,n):
+                    if parentList[x].on[j] != parentList[x+1].on[j]:
+                        source = blockNames[j]
+                        #print("Move(" + str(who) + "," + str(source) + "," + str(destination) + ")")
+                        return y
+            #Case when a block moves from the table to the top of another block
+            elif parentList[x].table[y] == 1 and parentList[x+1].table[y] == 0:
+                source = "table"
+                who = blockNames[y]
+                for j in range(0,n):
+                    if parentList[x].on[j] != parentList[x+1].on[j]:
+                        destination = blockNames[j]
+                        #print("Move(" + str(who) + "," + str(source) + "," + str(destination) + ")")
+                        return y
+            #Case when a block moves from the top of a block to the top
+            #of another block
+            else:
+                if parentList[x].on[y] == None and parentList[x+1].on[y] != None:
+                    destination = blockNames[y]
+                    who = blockNames[parentList[x+1].on[y]]
+                    for j in range(0,n):
+                        if parentList[x].on[j] != None and parentList[x+1].on[j] == None:
+                            source = blockNames[j]
+                            #print("Move(" + str(who) + "," + str(source) + "," + str(destination) + ")")
+                            return parentList[x+1].on[y]
 
+def AStarHeuretic(n,children,goalState,towers,blockNames):
+    score = []
+    inOrderChildren = []
+    #This flag is true if the block of the current i block of the node sits on
+    #different blocks than the i block of the node of the goal state
+    onFlag = False
+
+    #Calculating the score for each node
+    for x in children:
+        score.append(0)
+        for i in range(n):
+            if (x.table[i] == 1 and goalState.table[i] == 0) or (x.table[i] == 0 and goalState.table[i] == 1):
+                score[-1] = score[-1] + 1
+            elif (x.table[i] == 0 and goalState.table[i] == 0):
+                if x.on[x.on.index(i)] != goalState.on[x.on.index(i)]:
+                    onFlag = True
+                currPosCheck = x.on.index(i)
+                while (x.table[currPosCheck] != 1) and (goalState.table[currPosCheck] != 1) and (onFlag == False):
+                    if x.on[x.on.index(currPosCheck)] != goalState.on[x.on.index(currPosCheck)]:
+                        onFlag = True
+                    currPosCheck = x.on.index(currPosCheck)
+                if onFlag:
+                    score[-1] = score[-1] + 2
+                elif (x.table[currPosCheck] != 1) or (goalState.table[currPosCheck] != 1):
+                    score[-1] = score[-1] + 2
+                onFlag = False
+
+    scoreCopy = copy.deepcopy(score)
+
+    minS = min(scoreCopy)
+    who = []
+    whoPriority = []
+
+    posMoves = []
+    for x in range(len(scoreCopy)):
+        if scoreCopy[x] == minS:
+            posMoves.append(children[x])
+
+    for x in posMoves:
+        parentStack = State.FindMoves(x)
+        who.append(MoveReturn(x,parentStack,n,blockNames))
+
+
+    for x in towers:
+        for j in who:
+            if j in who:
+                whoPriority.append(x.index(j))
+
+    maxP = whoPriority.index(max(whoPriority))
+
+    BestMove = posMoves[maxP]
+
+    return BestMove
+
+def AStar(startState,goalState,n,blockNames):
+    #A* search
+    currState = copy.deepcopy(startState)
+    nodeList = []
+    tempList = []
+    numOfTowers = 0
+    towers = []
+    tempTower = []
+
+    for x in range(len(goalState.on)):
+        if goalState.on[x] == None and goalState.table[x] == 0:
+            currPos = goalState.on.index(goalState.on[x])
+
+            while goalState.table[currPos] != 1:
+                tempTower.append(goalState.on.index(goalState.on[currPos]))
+                currPos = goalState.on.index(currPos)
+            tempTower.append(goalState.on.index(goalState.on[currPos]))
+
+            towers.append(copy.deepcopy(tempTower))
+            tempTower.clear()
+
+
+    while currState.table != goalState.table and currState.on != goalState.on:
+        State.CreateChildren(currState,nodeList,n)
+
+        currState = AStarHeuretic(n,nodeList,goalState,towers,blockNames)
+
+        nodeList.clear()
+
+
+    print("Solution:")
+    print(currState.table)
+    print(currState.on)
+
+    return currState
 
 def main():
     n = 3
@@ -334,7 +497,6 @@ def main():
     startState, goalState, n, blockNames = Parser()
     currState = startState
 
-    # print(blockNames)
     # print("\nInit...")
     # print(startState.table)
     # print(startState.on)
@@ -345,25 +507,34 @@ def main():
     #Choosing Deapth or Breadth first Search
     if sys.argv[1] == "depth":
         #Printing Starting and goal state
+        start = time.time()
         PrintStartGoalState(startState,goalState,blockNames,n)
 
+        #In Depth First Search
         print("\n\n****In Depth First Search:****")
         currState = State.TreeTraverse(startState,n,nodeList,nodeStack,goalState)
         parentStack = State.FindMoves(currState)
         print("\n")
         State.PrintMoves(currState,parentStack,n,blockNames)
+        end = time.time()
+        print("\nExecuted in: " + str(end - start))
     elif sys.argv[1] == "breadth":
         #Printing Starting and goal state
+        start = time.time()
         PrintStartGoalState(startState,goalState,blockNames,n)
 
+        #Breadth First Search
         print("\n\n****Breadth First Search:****")
         currState = startState
         currState = State.BreadthFirstSearch(startState,n,nodeList,nodeStack,goalState)
         parentStack = State.FindMoves(currState)
         print("\n")
         State.PrintMoves(currState,parentStack,n,blockNames)
+        end = time.time()
+        print("\nExecuted in: " + str(end - start))
     elif sys.argv[1] == "best":
         #Printing Starting and goal state
+        start = time.time()
         PrintStartGoalState(startState,goalState,blockNames,n)
 
         print("\n\n****Best First Search:****")
@@ -372,8 +543,24 @@ def main():
         parentStack = State.FindMoves(currState)
         print("\n")
         State.PrintMoves(currState,parentStack,n,blockNames)
+        end = time.time()
+        print("\nExecuted in: " + str(end - start))
+    elif sys.argv[1] == "astar":
+        #Printing Starting and goal state
+        start = time.time()
+        PrintStartGoalState(startState,goalState,blockNames,n)
+
+        #A*
+        print("\n\n***********AStar***********")
+        currState = startState
+        currState = AStar(startState,goalState,n,blockNames)
+        parentStack = State.FindMoves(currState)
+        print("\n")
+        State.PrintMoves(currState,parentStack,n,blockNames)
+        end = time.time()
+        print("\nExecuted in: " + str(end - start))
     else:
-        print("Error: Algorithms supported: breadth | depth ")
+        print("Error: Algorithms supported: breadth | depth | best | astar")
 
 
 
