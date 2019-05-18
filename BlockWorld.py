@@ -58,7 +58,7 @@ class State:
         foundSolution = False
         q = queue.Queue()
         q.put(currState)
-        #print(nodeList)
+
         while foundSolution == False:
             currState = q.get()
             if currState.table == goalState.table and currState.on == goalState.on:
@@ -68,13 +68,9 @@ class State:
                 print(currState.on)
             else:
                 State.CreateChildren(currState,nodeList,n)
-                #print(len(nodeList))
-                #print(nodeList)
                 for x in nodeList:
                     q.put(x)
                 nodeList.clear()
-                #print(len(nodeList))
-                #print(nodeList)
         return currState
 
 
@@ -129,18 +125,9 @@ class State:
     def PrintMoves(currState,parentStack,n,blockNames):
         parentList = []
         #Num of checks value. E.x If there are n states, there are n-1 moves
-        #print("-"*50)
         while len(parentStack) != 0:
             tmp = parentStack.pop()
-            #print(tmp.table)
-            #print(tmp.on)
             parentList.append(tmp)
-        #print("-"*50)
-        # print("-"*50)
-        # for x in range(0,len(parentList)):
-        #     print(parentList[x].table)
-        #     print(parentList[x].on)
-        # print("-"*50)
         numOfChecks = len(parentList) - 1
         for x in range(0,numOfChecks):
             for y in range(0,n):
@@ -152,7 +139,7 @@ class State:
                         if parentList[x].on[j] != parentList[x+1].on[j]:
                             source = blockNames[j]
                             print("Move(" + str(who) + "," + str(source) + "," + str(destination) + ")")
-                            #return y
+
                 #Case when a block moves from the table to the top of another block
                 elif parentList[x].table[y] == 1 and parentList[x+1].table[y] == 0:
                     source = "table"
@@ -161,7 +148,7 @@ class State:
                         if parentList[x].on[j] != parentList[x+1].on[j]:
                             destination = blockNames[j]
                             print("Move(" + str(who) + "," + str(source) + "," + str(destination) + ")")
-                            #return y
+
                 #Case when a block moves from the top of a block to the top
                 #of another block
                 else:
@@ -172,13 +159,12 @@ class State:
                             if parentList[x].on[j] != None and parentList[x+1].on[j] == None:
                                 source = blockNames[j]
                                 print("Move(" + str(who) + "," + str(source) + "," + str(destination) + ")")
-                                #return parentList[x+1].on[y]
+
 
 def Parser():
 
     inputObj = open(sys.argv[2],"r")
     input = inputObj.readlines()
-    #print(input)
 
     x = 2
     nameLen = 2
@@ -194,14 +180,8 @@ def Parser():
         for y in x:
             blockNames.append(y)
 
-    #blockNames = re.findall("[A-Z][0-9]*",input[2])
-    n = len(blockNames)
-
     #Storing n
-    # blockNames = re.findall("[A-Z][0-9]*",input[2])
-    # n = len(blockNames)
-    # print(blockNames)
-    # print(len(blockNames))
+    n = len(blockNames)
 
     startState = State(n)
     goalState = State(n)
@@ -220,7 +200,7 @@ def Parser():
     for x in tmpinit:
         for y in x:
             init.append(y)
-    #print(init)
+
     #Storing GOAL state
     goal = []
     tmpgoal = []
@@ -229,7 +209,6 @@ def Parser():
     for x in tmpgoal:
         for y in x:
             goal.append(y)
-    #print(goal)
 
     #Stripping ()
     for x in range(len(init)):
@@ -240,9 +219,6 @@ def Parser():
     #Removing HANDEMPTY
     init.remove("HANDEMPTY")
 
-    # print(init)
-    # print(goal)
-    # print("\n\n")
     #Initializing the starting state
     for x in init:
         tmp = x.split()
@@ -256,7 +232,6 @@ def Parser():
     #Initializing the goal state
     for x in goal:
         tmp = x.split()
-        #print(tmp)
         if tmp[0] == "CLEAR":
             goalState.on[blockNames.index(tmp[1])] = None
         elif tmp[0] == "ONTABLE":
@@ -268,11 +243,10 @@ def Parser():
     for x in range(n):
         onTableBlock.append(x)
     onTableBlock.append(None)
-    #print(onTableBlock)
+
     for x in goalState.on:
         del onTableBlock[onTableBlock.index(x)]
 
-    #print(onTableBlock)
     goalState.table[onTableBlock[0]] = 1
 
     return startState, goalState, n , blockNames
@@ -347,20 +321,9 @@ def BestFirstSearch(startState,goalState,n):
 def MoveReturn(currState,parentStack,n,blockNames):
     parentList = []
     #Num of checks value. E.x If there are n states, there are n-1 moves
-    #print("-"*50)
     parentList.append(parentStack.pop(0))
     parentList.append(parentStack.pop(0))
-    # while len(parentStack) != 0:
-    #     tmp = parentStack.pop()
-    #     #print(tmp.table)
-    #     #print(tmp.on)
-    #     parentList.append(tmp)
-    #print("-"*50)
-    # print("-"*50)
-    # for x in range(0,len(parentList)):
-    #     print(parentList[x].table)
-    #     print(parentList[x].on)
-    # print("-"*50)
+
     numOfChecks = len(parentList) - 1
     for x in range(0,numOfChecks):
         for y in range(0,n):
@@ -371,7 +334,6 @@ def MoveReturn(currState,parentStack,n,blockNames):
                 for j in range(0,n):
                     if parentList[x].on[j] != parentList[x+1].on[j]:
                         source = blockNames[j]
-                        #print("Move(" + str(who) + "," + str(source) + "," + str(destination) + ")")
                         return y
             #Case when a block moves from the table to the top of another block
             elif parentList[x].table[y] == 1 and parentList[x+1].table[y] == 0:
@@ -380,7 +342,6 @@ def MoveReturn(currState,parentStack,n,blockNames):
                 for j in range(0,n):
                     if parentList[x].on[j] != parentList[x+1].on[j]:
                         destination = blockNames[j]
-                        #print("Move(" + str(who) + "," + str(source) + "," + str(destination) + ")")
                         return y
             #Case when a block moves from the top of a block to the top
             #of another block
@@ -391,10 +352,9 @@ def MoveReturn(currState,parentStack,n,blockNames):
                     for j in range(0,n):
                         if parentList[x].on[j] != None and parentList[x+1].on[j] == None:
                             source = blockNames[j]
-                            #print("Move(" + str(who) + "," + str(source) + "," + str(destination) + ")")
                             return parentList[x+1].on[y]
 
-def AStarHeuretic(n,children,goalState,towers,blockNames):
+def AStarHeuretic(n,children,goalState,towers,blockNames,g):
     score = []
     inOrderChildren = []
     #This flag is true if the block of the current i block of the node sits on
@@ -423,6 +383,11 @@ def AStarHeuretic(n,children,goalState,towers,blockNames):
 
     scoreCopy = copy.deepcopy(score)
 
+    #Adding g to h -> f
+    for x in range(len(scoreCopy)):
+        scoreCopy[x] += 1
+
+    #Choosing the best move
     minS = min(scoreCopy)
     who = []
     whoPriority = []
@@ -456,7 +421,10 @@ def AStar(startState,goalState,n,blockNames):
     numOfTowers = 0
     towers = []
     tempTower = []
+    g = 1
 
+    #Priority - If two moves have the same f cost -> The block that has
+    #higher priority will move first
     for x in range(len(goalState.on)):
         if goalState.on[x] == None and goalState.table[x] == 0:
             currPos = goalState.on.index(goalState.on[x])
@@ -472,8 +440,8 @@ def AStar(startState,goalState,n,blockNames):
 
     while currState.table != goalState.table and currState.on != goalState.on:
         State.CreateChildren(currState,nodeList,n)
-
-        currState = AStarHeuretic(n,nodeList,goalState,towers,blockNames)
+        g = g + 1
+        currState = AStarHeuretic(n,nodeList,goalState,towers,blockNames,g)
 
         nodeList.clear()
 
@@ -496,13 +464,6 @@ def main():
 
     startState, goalState, n, blockNames = Parser()
     currState = startState
-
-    # print("\nInit...")
-    # print(startState.table)
-    # print(startState.on)
-    # print("\nGoal...")
-    # print(goalState.table)
-    # print(goalState.on)
 
     #Choosing Deapth or Breadth first Search
     if sys.argv[1] == "depth":
